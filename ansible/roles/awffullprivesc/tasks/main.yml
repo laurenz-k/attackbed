@@ -1,0 +1,37 @@
+---
+# tasks file for awffullprivesc
+- name: Install awffull
+  ansible.builtin.apt:
+    pkg:
+      - awffull
+  tags:
+    - install
+
+- name: Move cronjob-script
+  ansible.builtin.shell:
+    cmd: mv /etc/cron.daily/awffull /usr/share/awffull/awffull
+    creates: /usr/share/awffull/awffull
+  tags:
+    - install
+    - vuln
+    - cron
+
+- name: vulnerable permissions for cronjob-script
+  ansible.builtin.file:
+    path: /usr/share/awffull/awffull
+    owner: www-data
+  tags:
+    - install
+    - vuln
+    - cron
+
+- name: vulnerable permissions for cronjob-script
+  ansible.builtin.lineinfile:
+    path: /etc/cron.d/awffull
+    line: "*/15 * * * *     root   /usr/share/awffull/awffull"
+    create: true
+  tags:
+    - install
+    - vuln
+    - cron
+

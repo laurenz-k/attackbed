@@ -1,0 +1,6 @@
+---
+# defaults file for atb-ansible-novnc
+novnc_packages:
+  - websockify
+  - x11vnc
+  - novnc

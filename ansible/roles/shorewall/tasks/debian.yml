@@ -1,0 +1,19 @@
+---
+
+- name: install > Packages
+  apt:
+    state: present
+    pkg: shorewall
+
+- name: enable startup at boot
+  lineinfile: >
+    dest=/etc/default/shorewall
+    line="startup={{ shorewall_startup }}"
+    regexp="^startup="
+    state=present
+
+- name: install shorewall6
+  apt:
+    name:  "shorewall6"
+    state: present
+  when: shorewall6_configs != False

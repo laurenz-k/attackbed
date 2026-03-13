@@ -1,0 +1,15 @@
+---
+# tasks file for hostname
+- name: Modify cloudinit
+  ansible.builtin.copy:
+    content: "preserve_hostname: true"
+    dest: "/etc/cloud/cloud.cfg.d/99-preserve_hostname.cfg"
+
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+
+- name: Add to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ hostname_ip }} {{ hostname_fqdn }} {{ hostname }}"

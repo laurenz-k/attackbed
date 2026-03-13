@@ -1,0 +1,58 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for sliver
+- name: Download sliver-server
+  ansible.builtin.get_url:
+    url: "{{ sliver_serverurl }}"
+    dest: "/opt/{{ sliver_serverbin }}"
+    mode: '0700'
+
+- name: Download sliver-client
+  ansible.builtin.get_url:
+    url: "{{ sliver_clienturl }}"
+    dest: "/opt/{{ sliver_clientbin }}"
+    mode: '0755'
+
+
+- name: Copy sliver-service
+  ansible.builtin.template:
+    src: service.j2
+    dest: /etc/systemd/system/sliver.service
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Create sliver_client_config
+  ansible.builtin.file:
+    path: /opt/sliver-client/configs
+    state: directory
+    recurse: yes
+    owner: "{{ sliver_user }}"
+    group: "{{ sliver_user }}"
+
+- name: Link sliver_client_config
+  ansible.builtin.file:
+    src: /opt/sliver-client
+    dest: "/home/{{ sliver_user }}/.sliver-client"
+    state: link
+
+
+- name: Generate operator configs for each sliver user
+  ansible.builtin.shell:
+    cmd: |
+      /opt/{{sliver_serverbin}} operator --name {{ sliver_user }} \
+      --lhost localhost --save "/opt/sliver-client/configs"
+      chown -R {{ sliver_user }}:"{{ sliver_user }}" "/opt/sliver-client"
+  become: true
+  args:
+    executable: /bin/bash
+  changed_when: "'configs saved' in result.stdout"
+  register: result
+
+- name: Start Sliver service
+  ansible.builtin.systemd:
+    name: sliver
+    state: started
+    enabled: true
+  become: true

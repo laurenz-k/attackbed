@@ -1,0 +1,27 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for wazuh-manager
+- name: Prepare wazuh-repository
+  block:
+    - name: wazuh | no apt key
+      ansible.builtin.get_url:
+        url: "{{wazuh_repokey}}"
+        dest: "/opt/wazuh.gpg"
+
+    - name: wazuh | import apt key
+      ansible.builtin.shell:
+        cmd: cat /opt/wazuh.gpg | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
+        creates: /usr/share/keyrings/wazuh.gpg
+
+    - name: wazuh | apt source
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/wazuh.gpg] {{wazuh_repourl}}"
+        state: present
+
+- name: Install wazuh-manager
+  ansible.builtin.apt:
+    name: wazuh-manager
+    state: present
+
+- name: Start wazuh-manager
+  service: name=wazuh-manager.service state=started enabled=yes

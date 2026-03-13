@@ -1,0 +1,16 @@
+---
+# tasks file for disableresolved
+- name: Enable service httpd and ensure it is not masked
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    enabled: false
+    state: stopped
+    masked: yes
+
+- name: Create /etc/resolv.conf
+  ansible.builtin.template:
+   src: "{{disableresolved_template}}"
+   dest: /etc/resolv.conf
+   owner: root
+   group: root
+   mode: '0644'

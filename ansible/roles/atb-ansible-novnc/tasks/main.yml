@@ -1,0 +1,39 @@
+---
+# tasks file for atb-ansible-novnc
+- name: Install packages for novnc
+  become: true
+  ansible.builtin.package:
+    name: "{{ novnc_packages }}"
+  tags:
+    - install
+    - dependencies
+
+- name: Configure x11vnc service
+  ansible.builtin.template:
+    src: x11vnc.j2
+    dest: "/etc/systemd/system/x11vnc.service"
+    mode: '0644'
+  tags:
+    - install
+    - service
+
+- name: Configure websockify service
+  ansible.builtin.template:
+    src: websockify.j2
+    dest: "/etc/systemd/system/websockify.service"
+    mode: '0644'
+  tags:
+    - install
+    - service
+
+- name: Enable service x11vnc
+  ansible.builtin.service:
+    name: x11vnc
+    enabled: yes
+    state: restarted
+
+- name: Enable service websockify
+  ansible.builtin.service:
+    name: websockify
+    enabled: yes
+    state: restarted

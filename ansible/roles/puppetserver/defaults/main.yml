@@ -1,0 +1,4 @@
+---
+# defaults file for puppetmaster
+puppetmaster_repourl: "https://apt.puppet.com/puppet7-release-{{ansible_distribution_release}}.deb"
+puppetmaster_config: puppetlabs_server.tar.gz

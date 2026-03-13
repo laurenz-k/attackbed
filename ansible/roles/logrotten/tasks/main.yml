@@ -1,0 +1,65 @@
+---
+# tasks file for logrotten
+- name: Install logrotate
+  ansible.builtin.apt:
+    pkg:
+      - logrotate
+  tags:
+    - install
+
+- name: create vulnerable logrotate-config
+  ansible.builtin.template:
+    src: "{{logrotten_template}}"
+    dest: /etc/logrotate.d/apache2-vhost
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - config
+    - vuln
+    - logrotate
+
+- name: create web directory
+  ansible.builtin.file:
+    path: "{{logrotten_webdirectory}}"
+    owner: www-data
+    group: www-data
+    state: directory
+  tags:
+    - config
+    - vuln
+    - web
+
+- name: create log directory
+  ansible.builtin.file:
+    path: "{{logrotten_webdirectory}}/log"
+    owner: www-data
+    group: www-data
+    state: directory
+  tags:
+    - config
+    - vuln
+    - web
+
+- name: create bash_completion directory
+  ansible.builtin.file:
+    path: "/etc/bash_completion.d"
+    owner: root
+    group: root
+    mode: "0755"
+    state: directory
+  tags:
+    - config
+    - vuln
+    - web
+
+- name: rotate logs more often
+  ansible.builtin.lineinfile:
+    path: /etc/cron.d/apache2-vhost
+    line: "*/16 * * * *     root   /usr/sbin/logrotate -f /etc/logrotate.d/apache2-vhost"
+    create: true
+  tags:
+    - install
+    - vuln
+    - cron
+

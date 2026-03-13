@@ -1,0 +1,41 @@
+---
+# tasks file for atb-ansible-ghostserver
+- name: Create ghosts-directory
+  ansible.builtin.file:
+    path: "{{ ghostserver_userhome }}/ghosts"
+    state: directory
+    mode: '0755'    
+    owner: "{{ ghostserver_user }}"
+    group: "{{ ghostserver_user }}"
+
+- name: Create ghosts-data-directory
+  ansible.builtin.file:
+    path: "{{ ghostserver_userhome }}/ghosts/_g"
+    state: directory
+    mode: '0777'    
+    owner: "{{ ghostserver_user }}"
+    group: "{{ ghostserver_user }}"
+
+- name: Create ghosts-db-directory
+  ansible.builtin.file:
+    path: "{{ ghostserver_userhome }}/ghosts/_db"
+    state: directory
+    mode: '0777'    
+    owner: "{{ ghostserver_user }}"
+    group: "{{ ghostserver_user }}"
+
+- name: Download file from a file path
+  ansible.builtin.get_url:
+    url: "{{ ghostserver_dockerurl }}"
+    dest: "{{ ghostserver_userhome }}/ghosts/docker-compose.yml"
+
+- name: Tear down ghosts-server
+  ansible.builtin.shell:
+    chdir: "{{ ghostserver_userhome }}/ghosts"
+    cmd: docker compose down
+
+- name: Create and start services ghosts-server
+  ansible.builtin.shell:
+    chdir: "{{ ghostserver_userhome }}/ghosts"
+    cmd: docker compose up -d
+

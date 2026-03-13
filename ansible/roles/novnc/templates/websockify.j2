@@ -1,0 +1,10 @@
+[Unit]
+Description=Start noVNC at startup
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=websockify --web=/usr/share/novnc 6080 localhost:5900
+
+[Install]
+WantedBy=multi-user.target

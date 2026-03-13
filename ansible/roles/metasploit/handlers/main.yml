@@ -1,0 +1,6 @@
+- name: Restart msfrpcd
+  ansible.builtin.systemd:
+    name: msfrpcd
+    state: restarted
+    enabled: true
+

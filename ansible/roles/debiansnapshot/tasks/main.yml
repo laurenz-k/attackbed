@@ -1,0 +1,40 @@
+- name: Switch to archive mirror because of bullseye-backports
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: 'deb.debian.org/debian bullseye-backports'
+    replace: 'archive.debian.org/debian bullseye-backports'
+
+- name: Install apt-https-transport
+  become: yes
+  apt:
+      name: apt-transport-https
+      state: latest
+
+- name: Install snapshot repository
+  become: yes
+  apt_repository:
+      repo: "deb {{debsnap_httpmethod}}://snapshot.debian.org/archive/debian/{{debsnap_timestamp}}/ {{debsnap_debrelease}} main"
+      state: present
+
+- name: Check-Valid-Until false
+  become: yes
+  copy:
+      src: "apt.conf"
+      dest: "/etc/apt/apt.conf.d/00snapshot"
+
+- name: Pin snapshot repository
+  become: yes
+  copy:
+      src: "preferences.conf"
+      dest: "/etc/apt/preferences.d/snapshot"
+
+- name: Empty sources.list
+  become: yes
+  copy:
+      src: "sources.list"
+      dest: "/etc/apt/sources.list"
+
+- name: Update apt-cache
+  become: yes
+  apt:
+      update_cache: yes

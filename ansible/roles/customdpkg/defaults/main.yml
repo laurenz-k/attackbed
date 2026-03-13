@@ -1,0 +1,11 @@
+---
+# defaults file for atb-ansible-customdpkg
+customdpkg_repotpl: repo.j2
+customdpkg_sourceslist: aecid.list
+customdpkg_reposrv: puppet.attackbed.local
+customdpkg_dpkgpackages:
+  - healthcheckd_1.0-1_amd64.deb
+customdpkg_tmpdst: /opt
+customdpkg_update: false
+customdpkg_packages:
+  - healthcheckd

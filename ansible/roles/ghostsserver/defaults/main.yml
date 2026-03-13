@@ -1,0 +1,5 @@
+---
+# defaults file for atb-ansible-ghostserver
+ghostserver_user: "aecid"
+ghostserver_userhome: "/home/{{ ghostserver_user }}"
+ghostserver_dockerurl: "https://raw.githubusercontent.com/cmu-sei/GHOSTS/master/src/Ghosts.Api/docker-compose.yml"

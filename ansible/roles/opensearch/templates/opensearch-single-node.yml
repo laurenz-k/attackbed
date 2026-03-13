@@ -1,0 +1,13 @@
+{# Wolfgang Hotwagner updated this file on 19. April 2024 #}
+
+cluster.name: "{{ os_cluster_name }}"
+
+node.name: "{{ opensearch_hostname }}"
+
+network.host: "{{ opensearch_hosts[opensearch_hostname]['ip'] }}"
+
+http.port: 9200
+
+discovery.type: single-node
+
+bootstrap.memory_lock: true

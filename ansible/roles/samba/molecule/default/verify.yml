@@ -1,0 +1,16 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: "Install BATS"
+      package:
+        name: "bats"
+        state: present
+    # We run the BATS tests from the localhost, since they are black box tests
+    - name: "Run BATS tests for {{ ansible_hostname }}"
+      command:
+        cmd: "/usr/bin/bats {{ playbook_dir }}/files/samba.bats"
+      environment:
+        SUT_IP: "{{ ansible_default_ipv4.address }}"
+      delegate_to: localhost
+      changed_when: false

@@ -1,0 +1,5 @@
+---
+# defaults file for atb-ansible-dpkgrepo
+dpkgrepo_dest: /var/www/html/debian
+dpkgrepo_packages:
+  - healthcheckd_1.0-1_amd64.deb

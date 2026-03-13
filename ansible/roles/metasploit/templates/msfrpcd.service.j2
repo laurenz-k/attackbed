@@ -1,0 +1,12 @@
+[Unit]
+Description=start metasploit
+
+[Service]
+Type=simple
+WorkingDirectory=~
+ExecStart=/usr/bin/msfrpcd -n -P {{metasploit_rpcpassword}} -f
+Restart=on-failure
+User={{metasploit_user}}
+
+[Install]
+WantedBy=multi-user.target

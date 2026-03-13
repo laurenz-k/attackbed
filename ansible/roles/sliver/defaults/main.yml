@@ -1,0 +1,8 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for sliver
+sliver_serverurl: "https://github.com/BishopFox/sliver/releases/download/v1.5.36/sliver-server_linux"
+sliver_clienturl: "https://github.com/BishopFox/sliver/releases/download/v1.5.36/sliver-client_linux"
+sliver_serverbin: "sliver-server_linux"
+sliver_clientbin: "sliver-client_linux"
+sliver_user: "aecid"

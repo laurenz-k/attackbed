@@ -1,0 +1,5 @@
+---
+# handlers file for atb-ansible-nfsserver
+- name: exportfs
+  ansible.builtin.shell:
+    cmd: exportfs -arv

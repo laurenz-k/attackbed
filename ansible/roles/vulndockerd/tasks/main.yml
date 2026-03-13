@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for vulndockerd
+- name: Replace docker-startstring
+  ansible.builtin.lineinfile:
+    path: /lib/systemd/system/docker.service
+    regexp: '^ExecStart'
+    line: ExecStart=/usr/bin/dockerd -H fd:// -H {{vulndockerd_socket}} --containerd=/run/containerd/containerd.sock
+
+- name: Docker daemon restart
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+    name: docker

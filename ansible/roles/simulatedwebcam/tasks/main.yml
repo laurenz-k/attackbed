@@ -1,0 +1,32 @@
+---
+
+- name: Add user "camuser"  
+  user:
+    name: camuser
+    shell: /sbin/nologin
+    create_home: no
+    comment: "Webcam nologin User"
+    state: present
+  become: true
+
+
+- name: Include MediaMTX
+  ansible.builtin.include_tasks:
+    file: mediamtx.yml
+    apply:
+      tags:
+        - mediamtx
+  tags:
+    - always
+
+- name: Include FFMPeg
+  ansible.builtin.include_tasks:
+    file: ffmpeg.yml
+    apply:
+      tags:
+        - ffmpeg
+  tags:
+    - always
+
+
+# ffmpeg -re -stream_loop -1 -i motion-detection-computer-room-door-1920x1080.mp4 -c copy -f rtsp rtsp://camuser:campass@localhost:8554/mystream

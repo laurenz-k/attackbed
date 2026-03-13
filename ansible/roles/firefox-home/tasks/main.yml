@@ -1,0 +1,223 @@
+---
+- name: Ensure dependencies are installed
+  ansible.builtin.apt:
+    name: 
+      - tar
+      - wget
+      - packagekit-gtk3-module
+      - libasound2
+      - xvfb
+      - libegl1
+      - mesa-utils
+      - dbus-x11
+    state: present
+  become: yes
+
+- name: Define common paths and user
+  set_fact:
+    firefox_dir: "/home/{{ install_user }}/.local/share/firefox"
+    firefox_bin_dir: "/home/{{ install_user }}/.local/bin"
+    applications_dir: "/home/{{ install_user }}/.local/share/applications"
+    desktop_dir: "/home/{{ install_user }}/Desktop"
+    firefox_exec: "/home/{{ install_user }}/.local/share/firefox/firefox"
+    firefox_desktop_content: |
+      [Desktop Entry]
+      Name=Firefox
+      Exec=/home/{{ install_user }}/.local/bin/firefox %u
+      Terminal=false
+      Type=Application
+      Icon=/home/{{ install_user }}/.local/share/firefox/browser/chrome/icons/default/default128.png
+      Categories=Network;WebBrowser;
+
+- name: Create necessary directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ install_user }}"
+    group: "{{ install_user }}"
+    mode: '0755'
+  loop:
+    - "{{ firefox_dir }}"
+    - "{{ firefox_bin_dir }}"
+    - "{{ applications_dir }}"
+    - "{{ desktop_dir }}"
+  become: true
+
+
+- name: Download Firefox tarball and extract it
+  ansible.builtin.get_url:
+    url: "https://download.mozilla.org/?product=firefox-devedition-latest-ssl&os=linux64&lang=en-US"
+    dest: "/home/{{ install_user }}/firefox.tar.bz2"
+  become: yes
+  become_user: "{{ install_user }}"
+
+- name: Extract Firefox tarball as the install user
+  ansible.builtin.unarchive:
+    src: "/home/{{ install_user }}/firefox.tar.bz2"
+    dest: "{{ firefox_dir }}"
+    remote_src: yes
+    extra_opts:
+      - "--strip-components=1"
+  become: yes
+  become_user: "{{ install_user }}"
+
+
+- name: Create a symlink for Firefox in ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ firefox_exec }}"
+    dest: "{{ firefox_bin_dir }}/firefox"
+    state: link
+    force: yes
+  become: yes
+  become_user: "{{ install_user }}"
+
+- name: Add Firefox path to user's profile
+  ansible.builtin.lineinfile:
+    path: "/home/{{ install_user }}/.bashrc"
+    line: 'PATH=$PATH:{{ firefox_bin_dir }}'
+    create: yes
+    backup: yes
+  become_user: "{{ install_user }}"
+
+- name: Reload .bashrc for immediate effect
+  ansible.builtin.shell:
+    cmd: ". ~/.bashrc"
+  become_user: "{{ install_user }}"
+
+- name: Create Firefox menu entry
+  ansible.builtin.copy:
+    dest: "/home/{{ install_user }}/.local/share/applications/firefox.desktop"
+    content: "{{ firefox_desktop_content }}"
+    owner: "{{ install_user }}"
+    group: "{{ install_user }}"
+    mode: '0744'
+
+- name: Create Firefox desktop  entry
+  ansible.builtin.copy:
+    dest: "{{ desktop_dir }}/firefox.desktop"
+    content: "{{ firefox_desktop_content }}"
+    owner: "{{ install_user }}"
+    group: "{{ install_user }}"
+    mode: '0744'
+
+- name: Run Firefox in headless mode to create a profile
+  ansible.builtin.shell:
+    cmd: "timeout 10s {{ firefox_exec }} --headless"
+  become: yes
+  become_user: "{{ install_user }}"
+  environment:
+    HOME: "/home/{{ install_user }}"
+  register: firefox_run
+  ignore_errors: yes
+
+- name: Stop Firefox if running
+  ansible.builtin.command:
+    cmd: pkill firefox
+  ignore_errors: yes
+  become_user: "{{ install_user }}"
+
+- name: Wait until Firefox profile folder appears
+  ansible.builtin.shell:
+    cmd: "ls /home/{{ install_user }}/.config/mozilla/firefox | grep '.dev-edition-default'"
+  register: profile_check
+  changed_when: false
+  failed_when: profile_check.rc != 0
+  retries: 10
+  delay: 3
+  become_user: "{{ install_user }}"
+
+- name: Find Firefox profile folder
+  ansible.builtin.find:
+    paths: "/home/{{ install_user }}/.config/mozilla/firefox"
+    file_type: directory  
+    patterns: "*.dev-edition-default"
+  register: firefox_profiles
+
+
+- name: Set the profile directory
+  ansible.builtin.set_fact:
+    firefox_profile: "{{ firefox_profiles.files[0].path | basename }}"
+
+- name: Generate logins.json for stored credentials
+  ansible.builtin.copy:
+    dest: "/home/{{ install_user }}/.config/mozilla/firefox/{{ firefox_profile }}/logins.json"
+    content: |
+      {
+        "nextId": 2,
+        "logins": [
+          {
+            "id": 1,
+            "hostname": "https://www.linkedin.com",
+            "httpRealm": null,
+            "formSubmitURL": "https://www.linkedin.com",
+            "usernameField": "",
+            "passwordField": "",
+            "encryptedUsername": "MEIEEPgAAAAAAAAAAAAAAAAAAAEwFAYIKoZIhvcNAwcECJxdsXMWJcPeBBgJ+jp7p/DIkwHYWThVrMejkGPQX2xBg/A=",
+            "encryptedPassword": "MDoEEPgAAAAAAAAAAAAAAAAAAAEwFAYIKoZIhvcNAwcECA6xF5dIRpwcBBDngUvlsNf+jLah7COGJ485",
+            "guid": "{b3c3ade7-5d2d-4977-a277-ecd0c1bfb688}",
+            "encType": 1,
+            "timeCreated": 1740752539937,
+            "timeLastUsed": 1740752546775,
+            "timePasswordChanged": 1740752546775,
+            "timesUsed": 2,
+            "syncCounter": 2,
+            "everSynced": false,
+            "encryptedUnknownFields": null
+          }
+        ],
+        "potentiallyVulnerablePasswords": [],
+        "dismissedBreachAlertsByLoginGUID": {},
+        "version": 3
+      }
+    owner: "{{ install_user }}"
+    group: "{{ install_user }}"
+    mode: '0600'
+
+
+- name: Configure Firefox to use HTTP, HTTPS, and SOCKS proxy through user.js
+  ansible.builtin.copy:
+    dest: "/home/{{ install_user }}/.config/mozilla/firefox/{{ firefox_profile }}/user.js"
+    content: |
+      // Use manual proxy configuration
+      user_pref("network.proxy.type", 1);
+
+      // Set HTTP proxy and port
+      user_pref("network.proxy.http", "{{ firefox_proxy_address }}");
+      user_pref("network.proxy.http_port", {{ firefox_proxy_port }});
+
+      // Set HTTPS proxy and port
+      user_pref("network.proxy.ssl", "{{ firefox_proxy_address }}");
+      user_pref("network.proxy.ssl_port", {{ firefox_proxy_port }});
+
+      // Set SOCKS proxy and port
+      user_pref("network.proxy.socks", "{{ firefox_proxy_address }}");
+      user_pref("network.proxy.socks_port", {{ firefox_proxy_port }});
+
+      // Set WebSocket proxy support (WebSockets typically use HTTP/HTTPS proxies)
+      // user_pref("network.websocket.proxy", true);  // Enable WebSocket proxy support
+      // user_pref("network.websocket.http.proxy", "{{ firefox_proxy_address }}"); // WebSocket proxy address
+      // user_pref("network.websocket.http.port", {{ firefox_proxy_port }}); // WebSocket proxy port
+
+      // Optionally, disable proxy for local addresses
+      user_pref("network.proxy.no_proxies_on", "localhost, 127.0.0.1");
+    mode: '0644'
+    owner: "{{ install_user }}"
+    group: "{{ install_user }}"
+    force: yes
+  when: firefox_proxy_address is defined and firefox_proxy_port is defined
+
+- name: Append to user.js to allow unsigned extensions 
+  ansible.builtin.lineinfile:
+    path: "/home/{{ install_user }}/.config/mozilla/firefox/{{ firefox_profile }}/user.js"
+    line: 'user_pref("xpinstall.signatures.required", false);'
+    create: yes
+  when: allow_unsigned_extensions 
+
+
+
+
+
+
+
+
+ 

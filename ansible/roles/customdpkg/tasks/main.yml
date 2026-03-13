@@ -1,0 +1,34 @@
+---
+# tasks file for atb-ansible-customdpkg
+
+- name: Install custom repository
+  ansible.builtin.template:
+    src: "{{ customdpkg_repotpl }}"
+    dest: "/etc/apt/sources.list.d/{{ customdpkg_sourceslist }}"
+    owner: root
+    group: root
+  tags:
+    - repo
+
+- name: Upload Packages
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ customdpkg_tmpdst }}"
+    owner: root
+    group: root
+  with_items: "{{ customdpkg_dpkgpackages }}"
+
+
+- name: Install Packages
+  ansible.builtin.apt:
+    deb: "{{ customdpkg_tmpdst }}/{{ item }}"     
+    update_cache: "{{ customdpkg_update }}"
+    install_recommends: true
+  with_items: "{{ customdpkg_dpkgpackages }}"
+
+- name: Remove DPKG-files
+  ansible.builtin.file:
+    path: "{{ customdpkg_tmpdst }}/{{ item }}"
+    state: absent
+  with_items: "{{ customdpkg_dpkgpackages }}"
+

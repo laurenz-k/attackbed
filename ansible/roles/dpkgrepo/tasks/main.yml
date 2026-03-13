@@ -1,0 +1,24 @@
+---
+# tasks file for atb-ansible-dpkgrepo
+- name: Install packages for dpkg-repository
+  ansible.builtin.apt: 
+    pkg:
+      - apache2
+      - dpkg-dev
+
+- name: Create directory
+  ansible.builtin.file:
+    path: "{{ dpkgrepo_dest }}"
+    state: directory
+    recurse: true
+
+
+- name: Upload Packages
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ dpkgrepo_dest }}"
+    owner: root
+    group: root
+  with_items: "{{ dpkgrepo_packages }}"
+  notify: scanpackages
+

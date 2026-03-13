@@ -1,0 +1,28 @@
+---
+dependencies: []
+collections: 
+  - community.general
+
+galaxy_info:
+  role_name: apache2
+  author: Wolfgang Hotwagner
+  description: Apache2-Role
+  license: GPL-3.0
+  company: Austrian Institute of Technology
+  min_ansible_version: 2.1.0
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+  categories:
+    - system
+    - networking
+    - debian
+    - ubuntu
+    - webserver
+    - apache2

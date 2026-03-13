@@ -1,0 +1,71 @@
+---
+mate_install_recommends: false
+
+mate_recommends:
+  # vesa driver
+  - xserver-xorg-video-vesa
+  #  window manager
+  - lightdm
+  # mate document viewer
+  - atril
+  # extras utilities for caja file manger
+  - caja-admin
+  - caja-eiciel
+  - caja-gtkhash
+  - caja-open-terminal
+  - caja-rename
+  - caja-seahorse
+  - caja-sendto
+  - caja-wallpaper
+  # dconf cli utility
+  - dconf-cli
+  # archive manager
+  - engrampa
+  # read and write exFAT for FUSE
+  - exfat-fuse
+  # fonts
+  - fonts-ubuntu
+  # Debugger
+  - gdb
+  # tool to view and install deb files
+  - gdebi
+  # keyring and such
+  - gnome-keyring
+  - gpg-agent
+  # indicator and addons
+  - indicator-application
+  - indicator-power
+  - indicator-session
+  - indicator-sound
+  # mate packages
+  - mate-accessibility-profiles
+  - mate-applet-appmenu
+  - mate-applet-brisk-menu
+  - mate-calc
+  - mate-dock-applet
+  - mate-hud
+  - mate-menu
+  - mate-themes
+  - mate-tweak
+  - mate-window-buttons-applet
+  - mate-window-menu-applet
+  - mate-window-title-applet
+  # menu editing tool
+  - mozo
+  # network manager
+  - network-manager
+  - network-manager-gnome
+  - network-manager-openvpn-gnome
+  - network-manager-pptp-gnome
+  # onscreen keyboard
+  - onboard
+  # mate official editor
+  - pluma
+  # GnuPG frontend
+  - seahorse
+  # snap daemon
+  - snapd
+  # terminal
+  - xterm
+
+mate_dconf_src: ./files/dconf

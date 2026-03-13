@@ -1,0 +1,50 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for nextcloudrce
+- name: Create Nextcloud working directory
+  ansible.builtin.file:
+    path: "{{nextcloud_rce_dir}}"
+    state: directory
+    recurse: yes
+  tags:
+    - install
+
+- name: Upload sql-dump
+  ansible.builtin.copy:
+    src: dump.sql
+    dest: "{{nextcloud_rce_dir}}/dump.sql"
+  tags:
+    - install
+
+- name: Create custom config
+  ansible.builtin.template:
+    src: "{{nextcloud_rce_configfile}}"
+    dest: "{{nextcloud_rce_dir}}/config.php"
+  tags:
+    - install
+
+- name: Create docker-compose.yml
+  ansible.builtin.template:
+    src:  "{{ nextcloud_rce_docker_compose_template }}"
+    dest: "{{nextcloud_rce_dir}}/docker-compose.yml"
+  tags:
+    - install
+
+- name: Test if container is running
+  ansible.builtin.shell: "docker compose ps | grep nextcloud-app-"
+  args:
+    chdir: "{{nextcloud_rce_dir}}"
+  ignore_errors: true
+  register: container_result
+
+- name: Create cronjob for nextcloud
+  ansible.builtin.cron:
+    name: "Nextcloud cron"
+    minute: "*/2"
+    job: "/usr/bin/docker exec -u www-data -w /var/www/nextcloud nextcloud-app-1 bash -c 'php /var/www/nextcloud/cron.php > /dev/null'"
+
+- name: Start containers
+  ansible.builtin.shell: "docker compose up -d"
+  args:
+    chdir: "{{ nextcloud_rce_dir }}"
+  when: nextcloud_rce_start_container | bool #if used in combination with mail feature this has to be false at first to avoid fatal start up failure (defaults to true) 

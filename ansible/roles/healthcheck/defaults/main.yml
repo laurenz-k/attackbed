@@ -1,0 +1,5 @@
+---
+# defaults file for atb-ansible-healthcheck
+healthcheck_status: "OK"
+healthcheck_wrapper_path: "/usr/local/bin"
+healthcheck_wrapper_mode: "0755"

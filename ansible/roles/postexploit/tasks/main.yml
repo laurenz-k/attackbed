@@ -1,0 +1,16 @@
+---
+# tasks file for postexploit
+
+- name: Install apache httpd 
+  ansible.builtin.apt:
+    name: apache2
+  when: postexploit_apache == True
+
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "{{ postexploit_destpath }}/{{ item.name }}"
+    owner: "{{ postexploit_owner }}"
+    group: "{{ postexploit_group }}"
+    mode: '0644'
+  with_items: "{{ postexploit_files }}"

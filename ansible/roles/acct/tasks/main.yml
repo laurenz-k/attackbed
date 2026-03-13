@@ -1,0 +1,12 @@
+---
+# tasks file for acct
+- name: Install acct
+  ansible.builtin.apt: 
+    name: acct 
+    state: present
+
+- name: Start acct
+  ansible.builtin.service:
+    name: acct.service
+    state: started
+    enabled: true

@@ -1,0 +1,6 @@
+---
+# handlers file for atb-ansible-dpkgrepo
+- name: scanpackages
+  ansible.builtin.shell:
+    chdir: "{{ dpkgrepo_dest }}"
+    cmd: dpkg-scanpackages . | gzip -c9  > Packages.gz

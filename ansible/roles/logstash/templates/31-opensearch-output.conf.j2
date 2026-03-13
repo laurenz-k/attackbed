@@ -1,0 +1,22 @@
+output {
+  if [@metadata][pipeline] {
+    opensearch {
+      hosts => {{ logstash_opensearch_hosts | to_json }}
+      cacert => "{{ logstash_opensearch_ca }}"
+      user => "{{ logstash_opensearch_user }}"
+      password => "{{ logstash_opensearch_password }}"
+      ssl_certificate_verification => {{ logstash_opensearch_sslverify | lower }}
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+      pipeline => "%{[@metadata][pipeline]}"
+    }
+  } else {
+    opensearch {
+      hosts => {{ logstash_opensearch_hosts | to_json }}
+      cacert => "{{ logstash_opensearch_ca }}"
+      user => "{{ logstash_opensearch_user }}"
+      password => "{{ logstash_opensearch_password }}"
+      ssl_certificate_verification => {{ logstash_opensearch_sslverify | lower }}
+      index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    }
+  }
+}

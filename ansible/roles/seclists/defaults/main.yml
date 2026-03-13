@@ -1,0 +1,7 @@
+---
+# defaults file for seclists
+seclists_repo: https://github.com/danielmiessler/SecLists.git
+seclists_dest: /usr/local/share/SecLists
+seclists_owner: root
+seclists_group: "{{seclists_owner}}"
+seclists_update: False

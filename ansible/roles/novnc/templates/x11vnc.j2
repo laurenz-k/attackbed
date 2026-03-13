@@ -1,0 +1,11 @@
+[Unit]
+Description=Start x11vnc at startup
+After=multi-user.target
+
+[Service]
+Environment=DISPLAY=:0
+Type=simple
+ExecStart=/usr/bin/x11vnc -forever -loop -noxdamage -repeat -rfbport 5900 -shared -o /var/log/x11vnc.log -auth guess
+
+[Install]
+WantedBy=multi-user.target

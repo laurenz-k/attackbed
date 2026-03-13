@@ -1,0 +1,40 @@
+- name: Download MediaMTX
+  ansible.builtin.get_url:
+    url: "{{simulatedwebcam_mediatmx_url}}"
+    dest: "/opt/mediamtx.tar.gz"
+
+- name: Create directory /usr/local/share/mediamtx
+  ansible.builtin.file:
+    path: /usr/local/share/mediamtx
+    state: directory
+    mode: '0755'
+
+- name: Extract /opt/mediamtx.tar.gz
+  ansible.builtin.unarchive:
+    src: /opt/mediamtx.tar.gz
+    dest: /usr/local/share/mediamtx/
+    remote_src: true
+  become: true
+
+- name: Create mediamtx configuration
+  ansible.builtin.template:
+    src: mediamtx.yml.j2
+    dest: /etc/mediamtx.yml
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create mediamtx service
+  ansible.builtin.template:
+    src: mediamtx.service.j2
+    dest: /lib/systemd/system/mediamtx.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Start mediamtx service
+  systemd:
+    name: mediamtx
+    state: started
+    enabled: true
+

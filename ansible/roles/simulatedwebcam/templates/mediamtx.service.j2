@@ -1,0 +1,12 @@
+[Unit]
+Description=Starts the RTSP-Proxy
+After=network.target
+
+[Service]
+Type=simple
+User=camuser
+ExecStart=/usr/local/share/mediamtx/mediamtx /etc/mediamtx.yml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

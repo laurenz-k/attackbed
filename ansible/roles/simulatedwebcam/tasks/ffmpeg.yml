@@ -1,0 +1,16 @@
+# tasks file for simulatedwebcam
+- name: Install Webcam Tools
+  ansible.builtin.apt:
+    pkg: "{{simulatedwebcam_tools}}"
+    state: present
+  tags: [install]
+  become: true
+
+- name: Create ffmpeg service
+  ansible.builtin.template:
+    src: ffmpeg.service.j2
+    dest: /lib/systemd/system/ffmpeg.service
+    owner: root
+    group: root
+    mode: 0644
+

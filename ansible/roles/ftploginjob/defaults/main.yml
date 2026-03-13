@@ -1,0 +1,8 @@
+---
+# defaults file for atb-ansible-ftploginjob
+ftploginjob_username: "aecid"
+ftploginjob_password: "aecid"
+ftploginjob_cmd: "'ls /home'"
+ftploginjob_server: 172.17.100.122 
+ftploginjob_job: "echo {{ ftploginjob_cmd }} | /usr/bin/lftp -u {{ ftploginjob_username }},{{ ftploginjob_password }} {{ ftploginjob_server }}"
+

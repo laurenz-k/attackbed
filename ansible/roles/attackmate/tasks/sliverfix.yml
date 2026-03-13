@@ -1,0 +1,125 @@
+- name: Download the 'current' file containing the .whl URL
+  ansible.builtin.get_url:
+    url: "{{ grpc_patch_url }}" # This should be the URL to the 'current' file, e.g., https://aecidimages.ait.ac.at/EXTRA/grpc/debian/12/x86_64/current
+    dest: "/tmp/current"
+    mode: '0644'
+  register: download_result
+  ignore_errors: true # Set to true if it's acceptable for 'current' file not to exist for some distributions
+  tags:
+    - install
+    - pip
+    - grpc
+
+- name: Read the .whl URL from the 'current' file
+  ansible.builtin.slurp:
+    src: "/tmp/current"
+  register: current_file_content
+  when: download_result.status_code | default(404) == 200
+
+- name: Set fact with the extracted .whl URL
+  ansible.builtin.set_fact:
+    grpc_whl_download_url: "{{ current_file_content['content'] | b64decode | trim }}"
+  when:
+    - download_result.status_code | default(404) == 200
+    - current_file_content.content is defined
+    - current_file_content.content | b64decode | trim != '' # Ensure the content is not empty after decoding/trimming
+
+- name: Set fact with the .whl filename
+  ansible.builtin.set_fact:
+    grpc_whl_filename: "{{ grpc_whl_download_url.split('/') | last }}"
+  when: grpc_whl_download_url is defined
+
+- name: Download the actual .whl file
+  ansible.builtin.get_url:
+    url: "{{ grpc_whl_download_url }}"
+    dest: "/tmp/{{ grpc_whl_filename }}"
+    mode: '0644'
+  when: grpc_whl_download_url is defined
+  register: download_whl_file_result
+  tags:
+    - install
+    - pip
+    - grpc
+
+- name: Install grpc patch if available
+  ansible.builtin.shell:
+    chdir: "{{ attackmate_dest }}"
+    cmd: "uv pip install --python {{ attackmate_dest }}/.venv/bin/python /tmp/{{ grpc_whl_filename }}"
+  when: download_result.status_code | default(404) == 200
+  tags:
+    - install
+    - pip
+    - grpc
+
+- name: Grpc patch INFO
+  ansible.builtin.debug:
+    msg:
+    - "No grpc patch available falling back to compile locally"
+    - "This will take a while depending on your system"
+  when: download_result.status_code | default(403) != 200
+
+- name: Git checkout grpc
+  ansible.builtin.git:
+    repo: 'https://github.com/grpc/grpc'
+    dest: "{{ attackmate_grpc_dest }}"
+    recursive: yes
+    update: yes  
+  when: download_result.status_code | default(404) != 200
+
+- name: Install packages for sliverfix
+  become: true
+  ansible.builtin.package:
+    name: "{{ attackmate_dev_packages }}"
+  tags:
+    - install
+    - dependencies
+  when: download_result.status_code | default(404) != 200
+
+- name: Create virtual environment with uv
+  become: true
+  ansible.builtin.shell:
+    chdir: "{{ attackmate_grpc_dest }}"
+    cmd: "uv venv"
+  args:
+    creates: "{{ attackmate_grpc_dest }}/.venv"
+  tags:
+    - install
+    - pip
+  when: download_result.status_code | default(404) != 200
+
+- name: Install Python dependencies using uv
+  ansible.builtin.shell:
+    chdir: "{{ attackmate_grpc_dest }}"
+    cmd: "uv pip sync --python .venv/bin/python requirements.txt" 
+  tags:
+    - install
+    - pip
+    - grpc
+  when: download_result.status_code | default(404) != 200
+
+- name: Compile and install grpc to attackmate
+  ansible.builtin.shell:
+    chdir: "{{ attackmate_grpc_dest }}"
+    cmd: "GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True uv pip install --python {{ attackmate_dest }}/.venv/bin/python ."
+  tags:
+    - install
+    - pip
+    - grpc
+  when: download_result.status_code | default(404) != 200
+
+- name: Remove grpc dev-files
+  ansible.builtin.shell:
+    cmd: "test -d {{ attackmate_grpc_dest }} && rm -rf {{ attackmate_grpc_dest }}"
+  tags:
+    - install
+    - pip
+    - grpc
+  when: download_result.status_code | default(404) != 200
+
+- name: Lock sliverfix
+  ansible.builtin.shell:
+    cmd: "touch {{ attackmate_dest }}/.venv/.sliverfix"
+  tags:
+    - install
+    - pip
+    - grpc

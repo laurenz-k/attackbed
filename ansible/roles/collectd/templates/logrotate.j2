@@ -1,0 +1,10 @@
+{{ collectd_logdir }}/*.log {
+    daily
+    rotate 14
+    compress
+    missingok
+    sharedscripts
+    postrotate
+        /usr/bin/systemctl restart collectd.service
+    endscript
+}

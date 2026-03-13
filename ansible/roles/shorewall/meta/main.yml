@@ -1,0 +1,23 @@
+---
+
+dependencies: []
+
+galaxy_info:
+
+  author:              Wolfgang Hotwagner
+  description: >
+    Shorewall ( forked from Elao )
+  license: MIT
+  min_ansible_version: 2.7
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - 20.04
+  categories:
+    - development
+    - web
+    - firewall
+    - security

@@ -1,0 +1,7 @@
+---
+# tasks file for atb-ansible-vsftpd
+- name: Install vsftpd server
+  ansible.builtin.apt:
+    name: vsftpd
+    update_cache: true
+    install_recommends: true

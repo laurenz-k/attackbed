@@ -1,0 +1,5 @@
+---
+# defaults file for puppetclient
+puppetclient_release: "bullseye"
+puppetclient_repourl: "https://apt.puppet.com/puppet7-release-{{puppetclient_release}}.deb"
+puppetclient_config: "linuxshare.tar.gz"

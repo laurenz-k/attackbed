@@ -1,0 +1,33 @@
+# tasks file for atb-ansible-healthcheck
+- name: ensure cron installed
+  ansible.builtin.apt:
+    name: cron
+    update_cache: true
+
+- name: deploy healthcheck script
+  ansible.builtin.copy:
+    src: healthcheck
+    dest: /usr/local/bin/healthcheck
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create destination directory
+  ansible.builtin.file:
+    path: "{{healthcheck_wrapper_path}}"
+    state: directory
+    recurse: yes
+
+- name: deploy cron-wrapper
+  ansible.builtin.template:
+    src: wrapper.j2
+    dest: "{{healthcheck_wrapper_path}}/healthcheck_cron.sh"
+    owner: root
+    group: root
+    mode: "{{healthcheck_wrapper_mode}}"
+
+- name: Create cron-job
+  ansible.builtin.cron:
+    name: "healthcheck"
+    job: "{{healthcheck_wrapper_path}}/healthcheck_cron.sh"
+    minute: "*/10"

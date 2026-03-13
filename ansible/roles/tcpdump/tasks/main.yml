@@ -1,0 +1,18 @@
+---
+# tasks file for atb-ansible-tcpdump
+
+- name: Install setcap
+  ansible.builtin.apt:
+    name: libcap2-bin
+    update_cache: true
+    install_recommends: true
+
+- name: Install tcpdump
+  ansible.builtin.apt:
+    name: tcpdump
+    update_cache: true
+    install_recommends: true
+  notify: setcap
+
+
+

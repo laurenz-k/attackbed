@@ -1,0 +1,56 @@
+---
+# tasks file for aecid-tools
+
+- name: Include Debian Variables
+  include_vars: debian.yml
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  tags: 
+    - vars
+    - config
+    - install
+
+
+- name: Install Packages
+  become: true
+  ansible.builtin.apt:
+    pkg: "{{aecidtools_packages}}"
+    update_cache: yes
+    state: latest
+  tags: install
+
+- name: Install tmux.conf
+  ansible.builtin.copy:
+    dest: "{{aecidtools_user_home}}/.tmux.conf"
+    src: "tmux.conf"
+  tags: 
+    - config
+    - tmux
+
+- name: Make tmuxinator config-dir
+  ansible.builtin.file:
+    path: "{{aecidtools_user_home}}/.config/tmuxinator"
+    state: directory
+    recurse: yes
+  tags: 
+    - config
+    - tmux
+    - tmuxinator
+
+- name: Install tmuxinator-session aecid
+  ansible.builtin.copy:
+    dest: "{{aecidtools_user_home}}/.config/tmuxinator/aecid.yml"
+    src: "aecid.yml"
+  tags: 
+    - config
+    - tmux
+    - tmuxinator
+
+
+- name: Install vimrc
+  ansible.builtin.copy:
+    dest: "{{aecidtools_user_home}}/.vimrc"
+    src: "vimrc"
+  tags: 
+    - config
+    - vim
+

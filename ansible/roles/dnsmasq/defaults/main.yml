@@ -1,0 +1,7 @@
+---
+# defaults file for dnsmasq
+dnsmasq_config: []
+dnsmasq_systemd_resolved_disable: "{{ ansible_service_mgr == 'systemd' }}"
+dnsmasq_manage_dir: false
+dnsmasq_ns_replacement: 8.8.8.8
+dnsmasq_managed_files: "{{ dnsmasq_config | map(attribute='name') | list | product(['conf']) | map('join', '.') }}"

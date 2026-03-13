@@ -1,0 +1,3 @@
+---
+# defaults file for atb-ansible-nfsserver
+nfsserver_shares: []

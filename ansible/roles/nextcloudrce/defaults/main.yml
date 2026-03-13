@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for nextcloudrce
+nextcloud_rce_dir: "/opt/nextcloud"
+nextcloud_rce_image: "ghcr.io/ait-testbed/attackbed/nextcloud:24.0.5"
+nextcloud_rce_domain: "172.17.100.125:8080"
+nextcloud_rce_docker_compose_template: "docker-compose.yml.j2"
+nextcloud_rce_start_container: true
+nextcloud_rce_configfile: "config.php.j2"

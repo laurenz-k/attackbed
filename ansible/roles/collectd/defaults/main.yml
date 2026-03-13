@@ -1,0 +1,13 @@
+---
+# defaults file for collectd
+collectd_bin: collectd
+collectd_default_config: collectd.conf.j2
+collectd_logdir: "/var/log/collectd"
+collectd_logfile: True
+collectd_config:
+        - name: "write"
+          content: |
+               LoadPlugin write_log
+               <Plugin write_log>
+                 Format Graphite
+               </Plugin>

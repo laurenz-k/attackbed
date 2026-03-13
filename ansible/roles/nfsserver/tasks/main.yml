@@ -1,0 +1,13 @@
+---
+# tasks file for atb-ansible-nfsserver
+- name: Install NFS server
+  ansible.builtin.apt:
+    name: nfs-server
+    update_cache: true
+    install_recommends: true
+
+- name: Set exports
+  ansible.builtin.template:
+    src: exports.j2
+    dest: /etc/exports
+  notify: exportfs

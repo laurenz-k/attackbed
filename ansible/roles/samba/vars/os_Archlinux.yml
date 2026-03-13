@@ -1,0 +1,30 @@
+# roles/samba/vars/os_Archlinux.yml
+---
+
+samba_build_packages:
+  - git
+  - base-devel
+  - python
+  - gnutls 
+  #- libacl1-devel 
+  #- libldap2-devel 
+  - pam 
+  - jansson
+
+samba_packages:
+  - smbclient
+
+samba_vfs_packages: []
+
+samba_selinux_packages: []
+samba_selinux_booleans: []
+
+samba_configuration_dir: /etc/samba
+samba_configuration: "{{ samba_configuration_dir }}/smb.conf"
+samba_username_map_file: "{{ samba_configuration_dir }}/smbusers"
+
+samba_services:
+  - nmbd
+  - smbd
+
+samba_www_documentroot: /var/www

@@ -1,0 +1,8 @@
+---
+strategy:
+  wait: false
+  force: true
+
+unattended_upgrades:
+  stop: true
+  disable: true

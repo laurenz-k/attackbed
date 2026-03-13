@@ -1,0 +1,12 @@
+[Unit]
+Description=Start TightVNC server at startup
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User={{ vnc_user }}
+ExecStartPre=/bin/sh -c '/usr/bin/vncserver -kill {{ vnc_display }} > /dev/null 2>&1 || :'
+ExecStart=/usr/bin/tightvncserver -geometry 1800x1000 -depth 16 -dpi 120 -alwaysshared {{ vnc_display }}
+ExecStop=/usr/bin/vncserver -kill {{ vnc_display }}
+[Install]
+WantedBy=multi-user.target

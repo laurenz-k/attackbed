@@ -1,0 +1,48 @@
+---
+# tasks file for collectd
+#
+- name: Install collectd
+  ansible.builtin.apt: 
+    name: "{{ collectd_bin }}"
+    state: present
+
+- name: Create Logdir
+  ansible.builtin.file:
+    path: "{{ collectd_logdir }}"
+    state: directory
+    owner: root
+    group: root
+
+- name: Create logrotate config
+  ansible.builtin.template:
+    src: "logrotate.j2"
+    dest: /etc/logrotate.d/collectd
+    owner: root
+    group: root
+    mode: "0644"
+  tags: [config]
+
+- name: Deploy default configuration
+  ansible.builtin.template:
+    src: "{{ collectd_default_config }}"
+    dest: /etc/collectd/collectd.conf
+    owner: root
+    group: root
+  notify: restart collectd
+  tags: [config]
+
+- name: Deploy custom configuration
+  ansible.builtin.copy:
+    dest: "/etc/collectd/collectd.conf.d/{{ item.name }}.conf"
+    content: "{{ item.content }}"
+    owner: root
+    group: root
+  with_items: "{{ collectd_config }}"
+  notify: restart collectd
+  tags: [config]
+
+- name: Start collectd
+  ansible.builtin.service:
+    name: collectd.service
+    state: started
+    enabled: true

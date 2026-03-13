@@ -1,0 +1,6 @@
+---
+# defaults file for weaklinuxuser
+weaklinuxuser_user: "john"
+weaklinuxuser_pass: "rambo"
+weaklinuxuser_sudo: True
+weaklinuxuser_groups: []

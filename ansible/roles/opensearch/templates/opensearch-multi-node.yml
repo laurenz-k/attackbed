@@ -1,0 +1,17 @@
+{# Wolfgang Hotwagner updated this file on 19. April 2024 #}
+
+cluster.name: "{{ os_cluster_name }}"
+
+node.name: "{{ opensearch_hostname }}"
+
+network.host: "{{ opensearch_hosts[opensearch_hostname]['ip'] }}"
+
+http.port: 9200
+
+bootstrap.memory_lock: true
+
+discovery.seed_hosts: ["{{ os_nodes }}"]
+
+cluster.initial_master_nodes: ["{{ os_master_nodes }}"]
+
+node.roles: [{{ opensearch_hosts[opensearch_hostname]['roles'] }}]

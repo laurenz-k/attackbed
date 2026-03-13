@@ -1,0 +1,42 @@
+- name: Install LibreOffice if not installed
+  become: true
+  apt:
+    name: libreoffice
+    state: present
+    update_cache: yes
+    
+
+- block:
+    - name: Map security level to numeric value
+      ansible.builtin.set_fact:
+        numeric_security_level: "{{ security_level_map[macro_security_level] }}"
+      vars:
+        security_level_map:
+          low: 0
+          medium: 1
+          high: 2
+          very-high: 3
+
+    - name: Get all home dirs
+      ansible.builtin.find:
+        paths: /home
+        file_type: directory
+      register: home_dirs
+
+    - name: Ensure LibreOffice config folder is absent
+      become: true
+      ansible.builtin.file:
+        path: "{{ item.path }}/.config/libreoffice"
+        state: absent
+      loop: "{{ home_dirs.files }}"
+
+    - name: Replace MacroSecurity values
+      become: true
+      ansible.builtin.replace:
+        path: /usr/lib/libreoffice/share/registry/main.xcd
+        regexp: '(?s)(<prop[^>]*oor:name="{{ item.key }}"[^>]*>.*?<value>).*?(</value>)'
+        replace: '\g<1>{{ item.value }}\g<2>'
+      loop:  
+        - { key: "MacroSecurityLevel", value: "{{ numeric_security_level }}" }
+        - { key: "DisableMacrosExecution", value: "{{ disable_macros_execution | lower }}" }
+

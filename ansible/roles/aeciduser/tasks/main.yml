@@ -1,0 +1,36 @@
+---
+# tasks file for aeciduser
+
+- name: Install sudo
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+
+# bugfix due to ansible-error
+- name: Install acl
+  ansible.builtin.apt:
+    name: acl
+    state: present
+
+
+- name: Add user
+  ansible.builtin.user:
+    name: "{{ aeciduser_name }}"
+    shell: "{{ aeciduser_shell }}"
+    comment: "aecid user"
+    password: "{{ aeciduser_pass }}"
+    create_home: True
+
+- name: Add user to the sudoers
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ aeciduser_name }}"
+    content: "{{ aeciduser_name }}  ALL=(ALL)  NOPASSWD: ALL"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy SSH Key
+  ansible.posix.authorized_key:
+    user: "{{ aeciduser_name }}"
+    state: present
+    key:  "{{ aeciduser_key }}"

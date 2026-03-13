@@ -1,0 +1,42 @@
+---
+#
+# Last Update:
+# Wolfgang Hotwagner updated this file on 23. April 2024
+#
+
+os_nodes: |-
+        {% for item in groups['os-cluster'] -%}
+          {{ item }}{% if not loop.last %}","{% endif %}
+        {%- endfor %}
+
+os_master_nodes: |-
+        {% for item in groups['master'] -%}
+          {{ item }}{% if not loop.last %}","{% endif %}
+        {%- endfor %}
+
+populate_inventory_to_hosts_file: true
+
+xms_value: 2
+xmx_value: 2
+cert_valid_days: 730
+copy_custom_security_configs: false
+custom_security_plugin_configs:
+  - files/tenants.yml
+  - files/roles.yml
+  - files/roles_mapping.yml
+  - files/internal_users.yml
+iac_enable: false
+cluster_type: single-node
+
+os_home: /usr/share/opensearch
+os_conf_dir: /usr/share/opensearch/config
+os_plugin_bin_path: /usr/share/opensearch/bin/opensearch-plugin
+os_sec_plugin_conf_path: /usr/share/opensearch/config/opensearch-security
+os_sec_plugin_tools_path: /usr/share/opensearch/plugins/opensearch-security/tools
+os_api_port: 9200
+os_test: True
+
+systemctl_path: /etc/systemd/system
+
+# Auth type: 'internal' or 'oidc' (OpenID). Default: internal
+auth_type: internal

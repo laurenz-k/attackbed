@@ -1,0 +1,45 @@
+- name: Install Thunderbird
+  apt:
+    name: thunderbird
+    state: present
+    update_cache: yes
+
+- name: Ensure Thunderbird profile Local Folders directory exists
+  file:
+    path: "{{ thunderbird_profile }}/Mail/Local Folders"
+    state: directory
+    owner: "{{ thunderbird_user }}"
+    group: "{{ thunderbird_user }}"
+    mode: '0755'
+  when: populate_emails
+
+- name: Create an inbox file
+  copy:
+    dest: "{{ thunderbird_profile }}/Mail/Local Folders/Inbox"
+    content: ""
+    owner: "{{ thunderbird_user }}"
+    group: "{{ thunderbird_user }}"
+    mode: '0644'
+  when: populate_emails
+
+- name: Add sample emails to Thunderbird inbox
+  copy:
+    dest: "{{ thunderbird_profile }}/Mail/Local Folders/Inbox"
+    content: |
+      From - Mon Feb 26 10:00:00 2024
+      Subject: Urgent! Action Required
+      From: phishing@example.com
+      To: victim@example.com
+
+      Click this link to update your credentials.
+
+      From - Tue Feb 27 12:00:00 2024
+      Subject: Invoice Payment Due
+      From: scammer@example.com
+      To: victim@example.com
+
+      Your invoice is overdue. Click here to pay now.
+    owner: "{{ thunderbird_user }}"
+    group: "{{ thunderbird_user }}"
+    mode: '0644'
+  when: populate_emails

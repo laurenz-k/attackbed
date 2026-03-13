@@ -1,0 +1,27 @@
+[package]
+name = "do-not-cry"
+authors = ["RotrixX <rotrixxlol@gmail.com>"]
+description = "Encrypt and decrypt directories/files using Aes cipher. When encrypting, DONOTCRY.txt file will be created and all files will have .donotcry extension."
+version = "1.4.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/RotrixLOL/do-not-cry"
+readme = "README.md"
+keywords = ["ransomware", "encryption", "decryption", "aes-cipher"]
+categories = ["command-line-utilities", "cryptography"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "libransom"
+path = "src/lib.rs"
+
+[[bin]]
+name = "donotcry"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.1.8", features = ["cargo"] }
+colored = "2.0.0"
+libaes = "0.6.4"
+walkdir = "2.3.2"

@@ -1,0 +1,59 @@
+- name: Install TightVNC server
+  ansible.builtin.package:
+    name:
+      - tightvncserver
+    state: present
+
+- name: Check if vnc_user is defined
+  ansible.builtin.debug:
+    msg: "vnc_user is set to {{ vnc_user }}"
+
+- name: Create .vnc directory
+  ansible.builtin.file:
+    path: "/home/{{ vnc_user }}/.vnc"
+    state: directory
+    mode: '0755' 
+    owner: "{{ vnc_user }}"
+    group: "{{ vnc_user }}"
+
+- name: Set VNC password for VNC user
+  ansible.builtin.shell: |
+    set -o pipefail
+    echo {{ vnc_password }} | vncpasswd -f > /home/{{ vnc_user }}/.vnc/passwd
+  args:
+    executable: /bin/bash
+    creates: /home/{{ vnc_user }}/.vnc/passwd
+
+- name: Set correct permissions for VNC passwd file
+  ansible.builtin.file:
+    path: /home/{{ vnc_user }}/.vnc/passwd
+    owner: "{{ vnc_user }}"
+    group: "{{ vnc_user }}"
+    mode: 0600
+
+- name: Set xstartup file
+  ansible.builtin.template:
+    src: xstartup.j2
+    dest: /home/{{ vnc_user }}/.vnc/xstartup
+    mode: '0700'
+    owner: "{{ vnc_user }}"
+    group: "{{ vnc_user }}"
+  become: yes
+
+- name: Configure VNC server
+  ansible.builtin.template:
+    src: vncserver.j2
+    dest: /etc/systemd/system/vncserver.service
+  become: yes
+  notify: reload systemd
+
+- name: Start and enable VNC server service
+  ansible.builtin.systemd:
+    name: vncserver.service
+    enabled: yes
+    state: started
+  become: yes
+  notify: reload systemd
+
+
+

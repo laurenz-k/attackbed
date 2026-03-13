@@ -1,0 +1,4 @@
+# defaults file for atb-ansible-tightvnc
+vnc_password: "password"
+vnc_port: 5900
+

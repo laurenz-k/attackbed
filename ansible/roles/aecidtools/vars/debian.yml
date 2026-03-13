@@ -1,0 +1,7 @@
+---
+aecidtools_packages:
+  - tmux
+  - tmuxinator
+  - vim
+  - rsync
+  - lnav

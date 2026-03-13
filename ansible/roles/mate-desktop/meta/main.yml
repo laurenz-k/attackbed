@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Benjamin Akhras
+  role_name: mate_desktop
+  namespace: ait
+  description: Install Mate Desktop
+  license: GPL-3.0
+  company: Austrian Institute of Technology
+  min_ansible_version: 2.1.0
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+    - name: Ubuntu
+      versions:
+        - bionic
+        - focal
+  galaxy_tags:
+    - desktop
+    - mate

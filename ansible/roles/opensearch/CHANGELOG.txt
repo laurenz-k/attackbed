@@ -1,0 +1,32 @@
+Version: v1.0.2
+
+* Make starting the service optional
+
+-- Wolfgang Hotwagner Mo, 23 April 2023 15:01:00 +0000
+
+Version: v1.0.1
+
+* Added `meta/main.yml`
+* Updated MAINTAINERS.md
+
+-- Wolfgang Hotwagner Mo, 22 April 2023 14:06:00 +0000
+
+Version: v1.0.0
+
+* Replaced hostvars and inventory by variable
+* Removed "set hostname" and "Populate /etc/hosts"
+* Added new default variables
+* Removed CI/CD-pipeline
+* Deleted roles/linux/dashboards
+* Moved dirs from roles/linux/opensearch to top level
+* Removed opensearch.yml
+* Removed CONTRIBUTING.md
+* Removed DEVELOPER_GUIDE.md
+* Removed CODE_OF_CONDUCT.md
+* Removed ADMINS.md
+* Removed directory files
+* Removed directory inventories
+* Removed .DS_Store
+* Removed .whitesource
+
+-- Wolfgang Hotwagner Fri, 19 April 2023 15:41:00 +0000

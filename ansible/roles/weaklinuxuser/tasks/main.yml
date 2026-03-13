@@ -1,0 +1,25 @@
+---
+# tasks file for weaklinuxuser
+- name: Install sudo
+  ansible.builtin.apt:
+    pkg:
+      - sudo
+  tags:
+    - install
+
+- name: Add user
+  ansible.builtin.user:
+    name: "{{weaklinuxuser_user}}"
+    password: "{{ weaklinuxuser_pass | password_hash('sha512', 'saltysalt')}}"
+    shell: /bin/bash
+    groups: "{{weaklinuxuser_groups}}"
+    create_home: true
+
+- name: Create passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{weaklinuxuser_user}}"
+    content: "{{weaklinuxuser_user}}  ALL=(ALL)  NOPASSWD: ALL"
+    owner: root
+    group: root
+    mode: "644"
+  when: weaklinuxuser_sudo

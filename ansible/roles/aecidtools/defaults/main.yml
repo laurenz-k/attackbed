@@ -1,0 +1,5 @@
+---
+# defaults file for aecid-tools
+aecidtools_user: "ubuntu"
+aecidtools_user_home: "/home/{{aecidtools_user}}"
+aecidtools_packages: []

@@ -1,0 +1,14 @@
+---
+# tasks file for sudoweakness
+- name: Install sudo
+  ansible.builtin.apt:
+    pkg:
+      - sudo
+  tags:
+    - install
+
+- name: Create vulnerable sudo-config
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/{{sudoweakness_filename}}
+    content: "{{sudoweakness_user}} ALL=(ALL) NOPASSWD: {{sudoweakness_vulnbin}}"
+    mode: "0644"

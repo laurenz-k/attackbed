@@ -1,0 +1,7 @@
+---
+# defaults file for disableresolved
+disableresolved_template: resolv.conf.j2
+disableresolved_header: "# CREATED WITH ANSIBLE"
+disableresolved_nameservers:
+        - 8.8.8.8
+        - 9.9.9.9

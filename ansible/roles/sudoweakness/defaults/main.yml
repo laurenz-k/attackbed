@@ -1,0 +1,5 @@
+---
+# defaults file for sudoweakness
+sudoweakness_user: "www-data"
+sudoweakness_filename: "{{sudoweakness_user}}"
+sudoweakness_vulnbin: "/usr/bin/dmesg"

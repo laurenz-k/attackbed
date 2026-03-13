@@ -1,0 +1,29 @@
+---
+# tasks file for puppetclient
+- name: Download Puppet-Repo-Config
+  ansible.builtin.shell: "wget -O /opt/puppet-release.deb {{puppetclient_repourl}}"
+  args:
+    creates: /opt/puppet-release.deb
+
+- name: Install Puppet-Repo-Config
+  ansible.builtin.apt:
+    deb: /opt/puppet-release.deb
+
+- name: Upload Configuration
+  ansible.builtin.unarchive:
+    owner: "root"
+    group: "root"
+    src: "{{puppetclient_config}}"
+    dest: /etc
+  tags:
+    - config
+
+- name: Install Puppet-Agent
+  ansible.builtin.apt:
+    name: puppet-agent
+    update_cache: true
+
+- name: Start Puppet
+  ansible.builtin.service:
+    name: puppet.service
+    state: started

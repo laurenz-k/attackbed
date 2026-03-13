@@ -1,0 +1,14 @@
+---
+# tasks file for atb-ansible-ftploginjob
+- name: Install lftp
+  ansible.builtin.apt:
+    pkg:
+      - lftp
+  tags:
+    - install
+
+- name: Create cron-job
+  ansible.builtin.cron:
+    name: "ftpjob"
+    job: "{{ ftploginjob_job }}"
+    minute: "*/5"

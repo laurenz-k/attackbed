@@ -1,0 +1,11 @@
+---
+# defaults file for zoneminder
+zoneminder_admin_pw: "zm_VERY_S3CURE_PASSW0RD"
+zoneminder_debrelease: "{{ansible_distribution_release}}"
+# zoneminder_cams:
+#   - name: cam-1
+#     id: 3
+#     url: rtsp://user:pass@hostname:8554/mystream
+#     width: 1920
+#     height: 1080
+zoneminder_cams: []

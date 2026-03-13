@@ -1,0 +1,268 @@
+# File: roles/samba/tasks/main.yml
+---
+
+- name: Update apt repositories
+  apt:
+    update-cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Include OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "os_{{ ansible_distribution }}_{{ ansible_distribution_version }}.yml"
+    - "os_{{ ansible_distribution }}.yml"
+    - "os_{{ ansible_os_family }}.yml"
+  tags: samba
+
+- name: Check current samba version
+  shell: >
+    set -o nounset -o pipefail -o errexit &&
+    smbd --version | sed 's/Version //' | grep -o -E '^(([0-9]*\.)*[0-9]*)'
+  args:
+    executable: /bin/bash
+  register: samba_version_check
+  changed_when: false
+  failed_when: false
+  tags: samba
+
+- name: Register samba version
+  set_fact:
+    samba_version: "{{ samba_version_check.stdout }}"
+  when: samba_version_check.stdout_lines|length
+
+- name: Identify installation state
+  set_fact:
+    samba_install: "{{ true if samba_version is not defined or (samba_install_version is defined and samba_install_version != samba_version) else false }}"
+    samba_reinstall: "{{ true if samba_version is defined and samba_install_version is defined and samba_install_version != samba_version else false }}"
+
+
+- name: "Installed Samba version:"
+  debug:
+    msg: "install: {{ samba_install }}"
+  tags: samba
+
+- name: Install build packages
+  package:
+    name: "{{ samba_build_packages }}"
+    state: present
+  tags: samba
+
+- name: Stop and disable samba services
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  when: samba_reinstall
+  loop: "{{ samba_services }}"
+
+- name: Uninstall old samba version
+  make:
+    chdir: "{{ samba_install_dir }}"
+    target: uninstall
+  when: samba_reinstall
+  tags: samba
+
+- name: Remove old git repository
+  file:
+    path: "{{ samba_install_dir }}"
+    state: absent
+  when: samba_reinstall
+  tags: samba
+
+- name: Select branch to clone
+  set_fact:
+    samba_clone_branch: "{{ samba_git_tag if samba_git_tag is defined else 'samba-'+samba_install_version if samba_install_version is defined else 'master' }}"
+
+- name: Clone the samba repository
+  git:
+    repo: "{{ samba_git }}"
+    dest: "{{ samba_install_dir }}"
+    version: "{{ samba_clone_branch }}"
+    single_branch: true
+    depth: 1
+  when: samba_install
+  tags: samba
+
+- name: Configure before making samba
+  command: ./configure {{ samba_configure_mandatory_options }} {{ samba_configure_options }}
+  args:
+    chdir: "{{ samba_install_dir }}"
+  when: samba_install
+  changed_when: false
+  tags: samba
+
+- name: Make samba
+  make:
+    chdir: "{{ samba_install_dir }}"
+    params: "{{ samba_make_options | default(omit, true) }}"
+  when: samba_install
+  tags: samba
+
+- name: Make install samba
+  make:
+    chdir: "{{ samba_install_dir }}"
+    target: install
+  when: samba_install
+  tags: samba
+
+- name: Install Samba packages
+  package:
+    name: "{{ samba_packages }}"
+    state: present
+  tags: samba
+
+
+- name: Create systemd service defintions
+  copy:
+    src: "{{ item }}.service"
+    dest: "/lib/systemd/system/{{ item }}.service"
+    mode: 0644
+  register: samba_systemd_service_changes
+  with_items: "{{ samba_services }}"
+
+- name: Reload service daemons
+  systemd:
+    name: "{{ item }}"
+    daemon_reload: true
+    enabled: true
+  with_items: "{{ samba_services }}"
+
+- name: Install Samba VFS extensions packages
+  package:
+    name: "{{ samba_vfs_packages }}"
+    state: present
+  when: samba_vfs_packages is defined
+  tags: samba
+
+- name: Register Samba version
+  shell: >
+    set -o nounset -o pipefail -o errexit &&
+    smbd --version | sed 's/Version //' | grep -o -E '^(([0-9]*\.)*[0-9]*)'
+  args:
+    executable: /bin/bash
+  register: samba_version_check
+  changed_when: false
+  tags: samba
+
+- name: samba version
+  set_fact:
+    samba_version: "{{ samba_version_check.stdout }}"
+
+# - name: "Installed Samba version:"
+#   debug:
+#     msg: "{{ samba_version }}"
+#   tags: samba
+
+- name: Install SELinux package
+  package:
+    name: "{{ samba_selinux_packages }}"
+    state: present
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'
+  tags: samba
+
+- name: Make sure SELinux boolean settings are correct
+  seboolean:
+    name: "{{ item }}"
+    state: true
+    persistent: true
+  with_items: "{{ samba_selinux_booleans }}"
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'
+  tags: samba
+
+- name: Create Samba shares root directory
+  file:
+    state: directory
+    path: "{{ samba_shares_root }}"
+    owner: root
+    group: root
+    mode: '0755'
+  when: samba_shares|length > 0
+  tags: samba
+
+- name: Create share directories
+  with_items: "{{ samba_shares }}"
+  file:
+    state: directory
+    path: "{{ item.path|default([samba_shares_root,item.name]|join('/')) }}"
+    owner: "{{ item.owner|default('root') }}"
+    group: "{{ item.group|default('users') }}"
+    mode: "{{ item.directory_mode|default('0775') }}"
+    setype: "{{ item.setype|default('samba_share_t') }}"
+  tags: samba
+
+- name: Samba configuration
+  template:
+    dest: "{{ samba_configuration }}"
+    src: smb.conf.j2
+    validate: 'testparm -s %s'
+    mode: 0644
+  notify:
+    - Restart Samba services
+  tags: samba
+
+- name: Install global include file
+  template:
+    src: "{{ samba_global_include }}"
+    dest: "{{ samba_configuration_dir }}"
+    validate: 'testparm -s %s'
+    mode: 0644
+  when: samba_global_include is defined
+  notify:
+    - Restart Samba services
+  tags: samba
+
+- name: Install home include file
+  template:
+    src: "{{ samba_homes_include }}"
+    dest: "{{ samba_configuration_dir }}"
+    validate: 'testparm -s %s'
+    mode: 0644
+  when: samba_homes_include is defined
+  notify:
+    - Restart Samba services
+  tags: samba
+
+- name: Install share specific include files
+  template:
+    src: "{{ item.include_file }}"
+    dest: "{{ samba_configuration_dir }}"
+    validate: 'testparm -s %s'
+    mode: 0644
+  when: item.include_file is defined
+  notify:
+    - Restart Samba services
+  with_items: "{{ samba_shares }}"
+  tags: samba
+
+- name: Create username map file if needed
+  template:
+    dest: "{{ samba_username_map_file }}"
+    src: smbusers.j2
+    mode: 0644
+  notify:
+    - Restart Samba services
+  when: samba_username_map is defined
+  tags: samba
+
+- name: Start Samba service(s)
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items: "{{ samba_services }}"
+  tags: samba
+
+- name: Create Samba users if they don't exist yet
+  shell: >
+    set -o nounset -o pipefail -o errexit &&
+    (pdbedit --user={{ item.name }} 2>&1 > /dev/null) \
+    || (echo {{ item.password }}; echo {{ item.password }}) \
+    | smbpasswd -s -a {{ item.name }}
+  args:
+    executable: /bin/bash
+  with_items: "{{ samba_users }}"
+  no_log: true
+  register: create_user_output
+  changed_when: "'Added user' in create_user_output.stdout"
+  tags: samba

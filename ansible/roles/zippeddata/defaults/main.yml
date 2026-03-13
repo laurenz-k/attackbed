@@ -1,0 +1,6 @@
+---
+# defaults file for atb-ansible-zippeddata
+
+zippeddata_data:
+        - url: https://zenodo.org/records/7477560/files/Annotations.zip?download=1
+          path: /media/data

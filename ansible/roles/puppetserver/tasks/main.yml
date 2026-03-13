@@ -1,0 +1,40 @@
+---
+# tasks file for puppetmaster
+- name: Download Puppet-Repo-Config
+  ansible.builtin.shell: "wget -O /opt/puppet-release.deb {{puppetmaster_repourl}}"
+  args:
+    creates: /opt/puppet-release.deb
+
+- name: Install Puppet-Repo-Config
+  ansible.builtin.apt:
+    deb: /opt/puppet-release.deb
+
+- name: Upload Configuration
+  ansible.builtin.unarchive:
+    owner: "root"
+    group: "root"
+    src: "{{puppetmaster_config}}"
+    dest: /etc
+  tags:
+    - config
+
+- name: Install Puppet-Server
+  ansible.builtin.apt:
+    name: puppetserver
+    update_cache: true
+
+- name: Ensure permissions on conf.d
+  ansible.builtin.file:
+    path: /etc/puppetlabs/puppetserver/
+    state: directory
+    recurse: yes
+    owner: puppet
+    group: puppet
+  tags:
+    - config
+
+- name: Start Puppet-Server
+  ansible.builtin.service:
+    name: puppetserver.service
+    state: started
+    enabled: true

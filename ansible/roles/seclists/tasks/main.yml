@@ -1,0 +1,15 @@
+---
+# tasks file for seclists
+- name: Clone SecLists from Git
+  ansible.builtin.git:
+    repo: "{{seclists_repo}}"
+    dest: "{{seclists_dest}}"
+    update: "{{seclists_update}}"
+
+- name: Set permissions of SecLists
+  ansible.builtin.file:
+    path: "{{seclists_dest}}"
+    owner: "{{seclists_owner}}"
+    group: "{{seclists_group}}"
+    recurse: True
+    state: directory

@@ -1,0 +1,39 @@
+---
+# tasks file for metasploit
+- name: Configure metasploit repository
+  block:
+    - name: metasploit | download
+      ansible.builtin.get_url:
+        url: "{{metasploit_url}}"
+        dest: /opt/msfinstall
+        mode: 755
+
+    - name: metasploit | install
+      ansible.builtin.command:
+        cmd: /opt/msfinstall
+        creates: /usr/bin/msfconsole
+
+- name: get user home directory
+  shell: >
+         getent passwd {{ metasploit_user }}  | awk -F: '{ print $6 }'
+  changed_when: false
+  register: user_home
+
+- name: Initialize MSFDatabase
+  become: True
+  become_user: "{{metasploit_user}}"
+  ansible.builtin.shell:
+  args:
+    cmd: msfdb --component database init
+    creates: "{{ user_home.stdout }}/.msf4/db"
+  when: metasploit_msfdb == True
+
+- name: Deploy service template
+  ansible.builtin.template:
+    src: msfrpcd.service.j2
+    dest: /etc/systemd/system/msfrpcd.service
+    owner: root
+    group: root
+    mode: 0744
+  notify: Restart msfrpcd
+ 

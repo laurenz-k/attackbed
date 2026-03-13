@@ -1,0 +1,1 @@
+thunderbird_profile: "/home/{{ thunderbird_user }}/.thunderbird/user.default-release"

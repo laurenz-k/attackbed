@@ -1,0 +1,29 @@
+#!/bin/bash
+
+project_path="{{ attackmate_dest }}"
+session="{{ attackmate_tmux_session }}"
+window="{{ attackmate_tmux_window }}"
+
+tmux has-session -t ${session} 2> /dev/null
+if [ $? == "1" ]
+then
+        echo "Starting session..."
+	command -v tmuxinator
+        if [ $0 == 0 ]
+        then
+                tmuxinator start ${session} --no-attach
+        else
+                tmux new-session -s ${session} -d
+        fi
+fi
+
+tmux select-window -t ${window} 2> /dev/null
+if [ $? == "1" ]
+then
+	echo "Create window"
+	tmux new-window -n ${window}
+	tmux send-keys -t "$session" Enter
+fi
+
+full_command="attackmate $*"
+tmux send-keys -t "$pane" "${full_command}" Enter
