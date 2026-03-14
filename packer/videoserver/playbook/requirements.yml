@@ -17,9 +17,6 @@ roles:
   - src: https://github.com/ait-testbed/atb-ansible-logrotten.git
     version: v1.2
     name: logrotten
-  - src: https://github.com/ait-testbed/atb-ansible-sudoweakness.git
-    version: v1.0
-    name: sudoweakness
   - src: https://github.com/ait-testbed/atb-ansible-sshkeyprivesc.git
     version: v1.0
     name: sshkeyprivesc
