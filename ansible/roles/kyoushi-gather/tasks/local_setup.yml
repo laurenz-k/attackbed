@@ -1,0 +1,10 @@
+- name: Ensure gather directories exist
+  local_action:
+    module: ansible.builtin.file
+    path: "{{ item }}"
+    state: directory
+    recurse: yes
+  loop:
+    - "{{ kyoushi_gather_dir }}"
+    - "{{ kyoushi_gather_configs_dir }}"
+    - "{{ kyoushi_gather_logs_dir }}"

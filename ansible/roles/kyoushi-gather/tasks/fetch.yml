@@ -1,0 +1,31 @@
+- name: Get log files
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ kyoushi_gather_logs_dir }}"
+    mode: pull
+    copy_links: "{{ item.copy_links | default(kyoushi_gather_rsync_copy_links) }}"
+    delete: "{{ item.delete | default(kyoushi_gather_rsync_delete) }}"
+    recursive: "{{ item.recursive | default(kyoushi_gather_rsync_recursive) }}"
+    use_ssh_args: "{{ kyoushi_gather_rsync_use_ssh_args }}"
+    times: "{{ item.times | default(kyoushi_gather_rsync_times) }}"
+    perms: "{{ item.perms | default(kyoushi_gather_rsync_perms) }}"
+    rsync_opts: "{{ kyoushi_gather_rsync_extra_options + (item.exclude | default([]) | map('regex_replace', '(.*)', '--exclude=\\1') | list) }}"
+  become: yes
+  ignore_errors: "{{ kyoushi_gather_ignore_errors }}"
+  loop: "{{ __kyoushi_gather_logs }}"
+
+- name: Get config files
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ kyoushi_gather_configs_dir }}/"
+    mode: pull
+    copy_links: "{{ item.copy_links | default(kyoushi_gather_rsync_copy_links) }}"
+    delete: "{{ item.delete | default(kyoushi_gather_rsync_delete) }}"
+    recursive: "{{ item.recursive | default(kyoushi_gather_rsync_recursive) }}"
+    use_ssh_args: "{{ kyoushi_gather_rsync_use_ssh_args }}"
+    times: "{{ item.times | default(kyoushi_gather_rsync_times) }}"
+    perms: "{{ item.perms | default(kyoushi_gather_rsync_perms) }}"
+    rsync_opts: "{{ kyoushi_gather_rsync_extra_options + (item.exclude | default([]) | map('regex_replace', '(.*)', '--exclude=\\1') | list) }}"
+  become: yes
+  ignore_errors: "{{ kyoushi_gather_ignore_errors }}"
+  loop: "{{ __kyoushi_gather_configs }}"

@@ -1,0 +1,3 @@
+---
+install_path: /tmp/install-sliver.sh
+setup_systemd: false

@@ -1,0 +1,50 @@
+---
+# defaults file for kyoushi-gather
+kyoushi_gather_rsync_use_ssh_args: true
+kyoushi_gather_rsync_extra_options: []
+kyoushi_gather_rsync_copy_links: true
+kyoushi_gather_rsync_delete: true
+kyoushi_gather_rsync_recursive: true
+kyoushi_gather_rsync_times: true
+kyoushi_gather_rsync_perms: false
+
+kyoushi_gather_ignore_errors: no
+kyoushi_gather_ignore_facts_extra: []
+kyoushi_gather_ignore_facts_base:
+  - kyoushi_gather_.*
+  - ansible_inventory_sources
+  - ansible_config_file
+  - playbook_dir
+  - inventory_dir
+  - inventory_file
+  - omit
+kyoushi_gather_save_facts: true
+
+kyoushi_gather_ignore_facts: "{{ (kyoushi_gather_ignore_facts_base + kyoushi_gather_ignore_facts_extra) | join('|') }}"
+kyoushi_gather_fact_keys: "{{ hostvars[inventory_hostname].keys() | reject('match', kyoushi_gather_ignore_facts) | list }}"
+
+kyoushi_gather_dir: "./gather"
+kyoushi_gather_host_dir: "{{ kyoushi_gather_dir }}/{{ inventory_hostname }}"
+kyoushi_gather_facts_file_name: facts.json
+kyoushi_gather_facts_file: "{{ kyoushi_gather_host_dir }}/{{ kyoushi_gather_facts_file_name }}"
+kyoushi_gather_configs_dir: "{{ kyoushi_gather_host_dir }}/configs"
+kyoushi_gather_logs_dir: "{{ kyoushi_gather_host_dir }}/logs"
+
+# we are using vars lookup here since accessing the values
+# via the hostvars entry for the host would some template variables
+# in a raw template state doing it this way we only get raw values
+# Note that variables that rely on variables set in the playbook/role they are used in
+# will be  undefined at this point
+kyoushi_gather_facts_template: |
+    {
+    {% for key in kyoushi_gather_fact_keys %}
+      "{{ key }}": {{ lookup('vars', key, default='__UNDEFINED__') | to_nice_json }}
+    {% if not loop.last %},{% endif %}
+    {% endfor %}
+    }
+
+kyoushi_gather_logs:
+    - /var/log
+
+kyoushi_gather_configs:
+    - /etc

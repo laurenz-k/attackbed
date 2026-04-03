@@ -1,0 +1,19 @@
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: auto
+    strategy: all
+  become: yes
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+  become: yes
+
+  # - name: Gather port listen facts
+  #   community.general.listen_ports_facts:
+  #   become: yes
+
+- name: Save fact information
+  local_action:
+    module: ansible.builtin.copy
+    content: "{{ kyoushi_gather_facts_template }}"
+    dest: "{{ kyoushi_gather_facts_file }}"

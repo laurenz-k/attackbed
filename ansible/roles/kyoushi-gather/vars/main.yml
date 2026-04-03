@@ -1,0 +1,30 @@
+---
+# vars file for kyoushi-gather
+
+__kyoushi_gather_logs: |
+    [
+    {% for _log in kyoushi_gather_logs %}
+    {% if _log is mapping %}
+        {{ _log }},
+    {% else %}
+        {
+            "src": "{{ _log }}",
+            "exclude": []
+        },
+    {% endif %}
+    {% endfor %}
+    ]
+
+__kyoushi_gather_configs: |
+    [
+    {% for _config in kyoushi_gather_configs %}
+    {% if _config is mapping %}
+        {{ _config }},
+    {% else %}
+        {
+            "src": "{{ _config }}",
+            "exclude": []
+        },
+    {% endif %}
+    {% endfor %}
+    ]
