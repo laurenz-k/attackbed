@@ -1,0 +1,5 @@
+sshkey            = "primary"
+adminpc_image     = "atb-adminpc-image-2026-04-04T06-59-44Z"
+videoserver_image = "atb-videoserver-image-2026-04-04T07-17-55Z"
+webcam_image      = "atb-webcam-image-2026-04-04T07-33-39Z"
+dnsserver_image   = "atb-corpdns-image-2026-04-04T07-47-53Z"
