@@ -1,0 +1,53 @@
+all:
+  vars:
+    jump_host: 10.110.0.37
+    proxy_args: "-o ProxyCommand='ssh -A -p 22 -W %h:%p -q aecid@{{ jump_host }}'"
+  hosts:
+    mgmt:
+      ansible_host: "{{ jump_host }}"
+      ansible_user: aecid
+    attacker:
+      ansible_host: 192.42.1.174
+      ansible_user: ubuntu
+      ansible_ssh_common_args: "{{ proxy_args }}"
+  children:
+    inetdns:
+      hosts:
+        192.42.2.2:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    corpdns:
+      hosts:
+        192.42.0.233:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    videoserver:
+      hosts:
+        172.17.100.121:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    inetfw:
+      hosts:
+        172.17.100.254:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    reposerver:
+      hosts:
+        172.17.100.122:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    adminpc1:
+      hosts:
+        10.12.0.222:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    webcam:
+      hosts:
+        172.17.100.80:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
+    userpc1:
+      hosts:
+        192.168.50.21:
+          ansible_user: aecid
+          ansible_ssh_common_args: "{{ proxy_args }}"
