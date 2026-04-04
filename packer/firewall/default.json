@@ -1,0 +1,7 @@
+{
+  "base_image": "Ubuntu 22.04",
+  "image_name": "atb-fw-inet-lan-dmz-image",
+  "security_group": "default",
+  "network": "c56f18e1-2721-4ad3-a6f0-cde6ab0e65f1",
+  "floating_ip_pool": "daecbf69-52c8-4ac8-a9e3-09b7d6e2ab44"
+}
