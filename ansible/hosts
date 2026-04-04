@@ -1,11 +1,12 @@
 all:
   vars:
     jump_host: 10.110.0.37
-    proxy_args: "-o ProxyCommand='ssh -A -p 22 -W %h:%p -q aecid@{{ jump_host }}'"
+    proxy_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -A -p 22 -W %h:%p -q aecid@{{ jump_host }}'"
   hosts:
     mgmt:
       ansible_host: "{{ jump_host }}"
       ansible_user: aecid
+      ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
     attacker:
       ansible_host: 192.42.1.174
       ansible_user: ubuntu
