@@ -221,24 +221,7 @@
           dest: "{{user_home.stdout}}/{{ item }}.yml"
           mode: '0755'
       loop:
-          - scenario_1_a_a
-          - scenario_1_b_a
-          - scenario_1_f_a
           - scenario_1_e_a
-          - scenario_1_c_a
-          - scenario_1_d_a
-          - scenario_1_a_b
-          - scenario_1_b_b
-          - scenario_1_c_b
-          - scenario_1_d_b
-          - scenario_1_e_b
-          - scenario_1_f_b
-          - scenario_1_a_c
-          - scenario_1_b_c
-          - scenario_1_c_c
-          - scenario_1_d_c
-          - scenario_1_e_c
-          - scenario_1_f_c
       tags:
          - metasploit
          - attackmate
