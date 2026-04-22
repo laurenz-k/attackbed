@@ -7,7 +7,7 @@ After=network.target mediamtx.service
 [Service]
 Type=simple
 User=camuser
-ExecStart=ffmpeg -re -stream_loop -1 -i {{simulatedwebcam_video}} -c copy -f rtsp {{simulatedwebcam_rtsp_url}}
+ExecStart=ffmpeg -re -stream_loop -1 -i {{simulatedwebcam_video}} -rtsp_transport tcp  -c copy -f rtsp {{simulatedwebcam_rtsp_url}}
 Restart=on-failure
 
 [Install]

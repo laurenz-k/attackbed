@@ -6,6 +6,15 @@
   tags: [install]
   become: true
 
+- name: Copy webcam simulation video
+  ansible.builtin.copy:
+    src: webcamsimulation.mp4
+    dest: "{{simulatedwebcam_video}}"
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
 - name: Create ffmpeg service
   ansible.builtin.template:
     src: ffmpeg.service.j2
@@ -14,3 +23,8 @@
     group: root
     mode: 0644
 
+- name: Start ffmpeg service
+  systemd:
+    name: ffmpeg
+    state: started
+    enabled: true
