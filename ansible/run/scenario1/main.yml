@@ -140,8 +140,6 @@
       tags:
           - playbooks
 
-    # TODO: Stage the backdoor payload
-
     - name: Copy playbooks
       become: True
       become_user: "{{attacker_user}}"
